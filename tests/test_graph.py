@@ -31,3 +31,12 @@ class GraphTests(unittest.TestCase):
         ]
         self.assertEqual(apk_graph(packages)["app@1"],
                          ("lib@2", "? missing"))
+
+    def test_reverse_traversal(self):
+        """Обратный обход находит прямых и транзитивных потребителей."""
+        from src.graph import reverse
+
+        graph = read_fixture("examples/diamond.txt", "1")
+        self.assertEqual(list(bfs(reverse(graph), "D@1")),
+                         ["D@1", "B@1", "C@1", "A@1"])
+        self.assertEqual(list(bfs(reverse(graph), "E@1")), ["E@1"])

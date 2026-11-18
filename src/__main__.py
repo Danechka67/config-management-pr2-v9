@@ -5,7 +5,7 @@ import tarfile
 
 from src.apk import exact_package, load_index
 from src.config import options
-from src.graph import apk_graph, bfs, package_id, read_fixture
+from src.graph import apk_graph, bfs, package_id, read_fixture, reverse
 
 
 def load(args):
@@ -26,7 +26,7 @@ def main():
     args = options()
     try:
         graph, root = load(args)
-        for node, targets in bfs(graph, root, args.filter).items():
+        for node, targets in bfs(reverse(graph), root, args.filter).items():
             print(f"{node}: {' '.join(targets)}")
     except (OSError, ValueError, KeyError, tarfile.TarError) as error:
         print(f"Ошибка: {error}", file=sys.stderr)

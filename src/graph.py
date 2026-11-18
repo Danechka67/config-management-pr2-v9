@@ -92,3 +92,12 @@ def name_of(node):
     if node.startswith("? "):
         return split(node.removeprefix("? "))[0]
     return node.split("@", 1)[0]
+
+
+def reverse(graph):
+    """Инвертировать рёбра для поиска зависимых пакетов."""
+    result = {node: [] for node in graph}
+    for node, targets in graph.items():
+        for child in targets:
+            result.setdefault(child, []).append(node)
+    return result
