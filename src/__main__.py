@@ -5,7 +5,8 @@ import tarfile
 
 from src.apk import exact_package, load_index
 from src.config import options
-from src.graph import apk_graph, bfs, package_id, read_fixture, reverse
+from src.graph import apk_graph, bfs, package_id, read_fixture
+from src.render import mermaid, png, tree
 
 
 def load(args):
@@ -22,13 +23,20 @@ def load(args):
 
 
 def main():
-    """Вывести достижимый граф."""
+    """Сохранить граф и при необходимости показать дерево."""
     args = options()
     try:
         graph, root = load(args)
-        for node, targets in bfs(reverse(graph), root, args.filter).items():
-            print(f"{node}: {' '.join(targets)}")
-    except (OSError, ValueError, KeyError, tarfile.TarError) as error:
+        result = bfs(graph, root, args.filter)
+        png(result, root, args.output)
+        diagram = args.output.with_suffix(".mmd")
+        diagram.write_text(mermaid(result), encoding="utf-8")
+        print(f"PNG: {args.output}")
+        print(f"Mermaid: {diagram}")
+        if args.ascii == "1":
+            print(tree(result, root))
+    except (OSError, ValueError, KeyError, tarfile.TarError,
+            ImportError, EOFError) as error:
         print(f"Ошибка: {error}", file=sys.stderr)
         return 1
     return 0
